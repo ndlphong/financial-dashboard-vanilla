@@ -1,12 +1,8 @@
 document.querySelector(".sidebar").addEventListener("transitionstart", function(event) {
     if (event.propertyName === 'width') {
-        // Assuming there's a delay property you're monitoring; adjust as needed
-        // Destroy existing charts
         chart3.destroy();
         chart2.destroy();
         chart.destroy();
-        
-        // chart3.destroy();
     }
 });
 
