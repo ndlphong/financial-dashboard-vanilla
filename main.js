@@ -1,24 +1,50 @@
 document.querySelector(".sidebar").addEventListener("transitionstart", function(event) {
     if (event.propertyName === 'width') {
-        chart3.destroy();
-        chart2.destroy();
-        chart.destroy();
+        // Instead of destroying charts, update their dimensions
+        updateChartDimensions(0); // Weight 0 for transition start
     }
 });
 
 document.querySelector(".sidebar").addEventListener("transitionend", function(event) {
     if (event.propertyName === 'width') {
-        // Recreate and re-render charts
-        chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
-        chart3.render();
-        chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
-        chart2.render();
-        chart = new ApexCharts(document.querySelector("#chart1"), options);
-        chart.render();
-    };
+        // Re-render charts with updated dimensions
+        updateChartDimensions(1); // Weight 1 for transition end
+    }
 });
 
-
+// Function to update chart dimensions with a scaling weight
+function updateChartDimensions(weight) {
+    chart.updateOptions({
+        chart: {
+            width: `${100 * weight}%`
+        }
+    }, false, false);
+    chart2.updateOptions({
+        chart: {
+            width: `${100 * weight}%`
+        }
+    }, false, false);
+    chart3.updateOptions({
+        chart: {
+            width: `${100 * weight}%`
+        }
+    }, false, false);
+    chart4.updateOptions({
+        chart: {
+            width: `${100 * weight}%`
+        }
+    }, false, false);
+    chart5.updateOptions({
+        chart: {
+            width: `${100 * weight}%`
+        }
+    }, false, false);
+    chart6.updateOptions({
+        chart: {
+            width: `${100 * weight}%`
+        }
+    }, false, false);
+}
 
 var options = {
     series: [
@@ -33,8 +59,8 @@ var options = {
     ],
 
     chart: {
-        height: '90%',  // Adjusts height dynamically based on the container
-        width: '100%',   // Adjusts width to fill the container
+        height: '90%',
+        width: '90%',   
         type: "line",
         dropShadow: {
             enabled: true,
@@ -50,6 +76,17 @@ var options = {
         toolbar: {
             show: false,
         },
+        events: {
+            legendClick: function (chartContext, seriesIndex, config) {
+                // Store the state of the legend in local storage
+                console.log(JSON.parse(localStorage.getItem('legendStates')))
+            }
+        },
+        legend: {
+            onItemClick: {
+                toggleDataSeries: true
+            }
+        }
     },
 
     colors: ["#77B6EA", "#545454"],
@@ -102,143 +139,15 @@ var options = {
     },
 };
 
-var chart = new ApexCharts(document.querySelector("#chart1"), options);
-chart.render();
-
-// Function to generate dates and prices
-function generateData() {
-    var dates = [];
-    var prices = [];
-
-    // Set the start date to 100 days ago
-    var startDate = new Date();
-    startDate.setDate(startDate.getDate() - 100);
-
-    // Generate data for 100 days
-    for (var i = 0; i < 100; i++) {
-        var newDate = new Date(startDate);
-        newDate.setDate(startDate.getDate() + i);
-        var price = Math.random() * 100 + 100; // Random price between 100 and 200
-
-        // Format the date as a string in YYYY-MM-DD format
-        var dateString = newDate.toISOString().split("T")[0];
-
-        dates.push(dateString);
-        prices.push(parseFloat(price.toFixed(2)));
-    }
-
-    return { dates, prices };
-}
-
-// Use the function to get the data
-var { dates, prices } = generateData();
-var buffer = 10;  // This can be adjusted to whatever value you prefer
-
-// ...prices is a spread operator to pass the prices array as individual arguments
-var minPrice = Math.round(Math.min(...prices) - buffer);
-var maxPrice = Math.round(Math.max(...prices) + buffer);
-
-// Example: log the generated data to console (can be removed if not needed)
-console.log(dates, prices);
 var options2 = {
-    series: [
-        {
-            name: "ABC INDUSTRIES",
-            data: prices.map((price, index) => [dates[index], price]),
-        },
-    ],
-
-    chart: {
-        height: '90%',  // Adjusts height dynamically based on the container
-        width: '100%',   // Adjusts width to fill the container
-        type: "area",
-        stacked: false,
-        zoom: {
-            type: "x",
-            enabled: true,
-            autoScaleYaxis: true,
-        },
-        toolbar: {
-            autoSelected: "zoom",
-        },
-    },
-
-    decimalsInFloat: 0,
-
-    dataLabels: {
-        enabled: false,
-    },
-
-    markers: {
-        size: 0,
-    },
-
-    title: {
-        text: "Stock Price Movement",
-        align: "left",
-    },
-
-    fill: {
-        type: "gradient",
-        gradient: {
-            shadeIntensity: 1,
-            inverseColors: false,
-            opacityFrom: 0.5,
-            opacityTo: 0,
-            stops: [0, 90, 100],
-        },
-    },
-
-    yaxis: {
-        min: minPrice,
-        max: maxPrice,
-        title: {
-            text: "Price",
-        },
-    },
-
-    xaxis: {
-        type: "datetime",
-    },
-
-    tooltip: {
-        shared: false,
-    },
-
-    stroke: {
-        curve: 'smooth' // Ensuring the lines are smoother
-    },
-
-    
-};
-
-var chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
-chart2.render();
-
-/**
- * Configuration options for the chart.
- *
- * @typedef {Object} Options3
- * @property {Array} series - An array of series objects containing the name and data for each series.
- * @property {Object} chart - Configuration options for the chart.
- * @property {Object} forecastDataPoints - Configuration options for the forecast data points.
- * @property {Object} stroke - Configuration options for the stroke.
- * @property {Object} xaxis - Configuration options for the x-axis.
- * @property {Object} title - Configuration options for the title.
- * @property {Object} fill - Configuration options for the fill.
- * @property {Object} tooltip - Configuration options for the tooltip.
- */
-
-
-var options3 = {
     series: [{
         name: 'Sales',
         data: [4, 3, 10, 9, 29, 19, 22, 9, 12, 7, 19, 5, 13, 9, 17, 2, 7, 5]
     }],
 
     chart: {
-        height: '90%',  // Adjusts height dynamically based on the container
-        width: '100%',   // Adjusts width to fill the container
+        height: '90%',  
+        width: '90%', 
         type: 'line',
     },
 
@@ -304,5 +213,185 @@ var options3 = {
     }
 };
 
+
+function generateData() {
+    var dates = [];
+    var prices = [];
+    var startDate = new Date();
+    startDate.setDate(startDate.getDate() - 365);
+
+    for (var i = 0; i < 365; i++) {
+        var newDate = new Date(startDate);
+        newDate.setDate(startDate.getDate() + i);
+        var price = Math.random() * 100 + 100; 
+        var dateString = newDate.toISOString().split("T")[0];
+
+        dates.push(dateString);
+        prices.push(parseFloat(price.toFixed(2)));
+    }
+
+    return { dates, prices };
+}
+
+var { dates, prices } = generateData();
+var buffer = 10;  
+var minPrice = Math.round(Math.min(...prices) - buffer);
+var maxPrice = Math.round(Math.max(...prices) + buffer);
+
+let currentView = 'daily';
+
+function generateDailyData(prices, dates) {
+    return prices.map((price, index) => [dates[index], price]);
+}
+
+function generateWeeklyData(prices, dates) {
+    let weeklyData = [];
+    for (let i = 0; i < prices.length; i += 7) {
+        const weeklyPrices = prices.slice(i, i + 7);
+        const weeklyAverage = weeklyPrices.reduce((sum, price) => sum + price, 0) / weeklyPrices.length;
+        weeklyData.push([dates[i], weeklyAverage.toFixed(2)]);
+    }
+    return weeklyData;
+}
+
+function generateMonthlyData(prices, dates) {
+    let monthlyData = [];
+    for (let i = 0; i < prices.length; i += 30) {
+        const monthlyPrices = prices.slice(i, i + 30);
+        const monthlyAverage = monthlyPrices.reduce((sum, price) => sum + price, 0) / monthlyPrices.length;
+        monthlyData.push([dates[i], monthlyAverage.toFixed(2)]);
+    }
+    return monthlyData;
+}
+
+var options3 = {
+    series: [
+        {
+            name: "ABC INDUSTRIES",
+            data: prices.map((price, index) => [dates[index], price]),
+        },
+    ],
+
+    chart: {
+        height: '90%', 
+        width: '90%',   
+        type: "area",
+        stacked: false,
+        zoom: {
+            type: "x",
+            enabled: true,
+            autoScaleYaxis: true,
+        },
+        toolbar: {
+            autoSelected: "zoom",
+        },
+    },
+
+    decimalsInFloat: 0,
+
+    dataLabels: {
+        enabled: false,
+    },
+
+    markers: {
+        size: 0,
+    },
+
+    title: {
+        text: "Stock Price Movement",
+        align: "left",
+    },
+
+    fill: {
+        type: "gradient",
+        gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.5,
+            opacityTo: 0,
+            stops: [0, 90, 100],
+        },
+    },
+
+    yaxis: {
+        min: minPrice,
+        max: maxPrice,
+        title: {
+            text: "Price",
+        },
+    },
+
+    xaxis: {
+        type: "datetime",
+    },
+
+    tooltip: {
+        shared: false,
+    },
+
+    stroke: {
+        curve: 'smooth' 
+    },   
+}
+
+document.getElementById('monthlyButton').addEventListener('click', function() {
+    currentView = 'monthly';
+    updateChart('monthly');
+    setActiveButton('monthlyButton');
+});
+
+document.getElementById('weeklyButton').addEventListener('click', function() {
+    currentView = 'weekly';
+    updateChart('weekly');
+    setActiveButton('weeklyButton');
+});
+
+document.getElementById('dailyButton').addEventListener('click', function() {
+    currentView = 'daily';
+    updateChart('daily');
+    setActiveButton('dailyButton');
+});
+
+function setActiveButton(buttonId) {
+    const buttons = document.querySelectorAll('.button-container button');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.getElementById(buttonId).classList.add('active');
+}
+
+function updateChart(view) {
+    let data;
+    if (view === 'monthly') {
+        data = generateMonthlyData(prices, dates);
+    } else if (view === 'weekly') {
+        data = generateWeeklyData(prices, dates);
+    } else {
+        data = generateDailyData(prices, dates);
+    }
+
+    chart3.updateSeries([{
+        name: "ABC INDUSTRIES",
+        data: data
+    }]);
+}
+document.getElementById('dailyButton').click();
+
+var chart = new ApexCharts(document.querySelector("#chart1"), options);
+chart.render(chart, 'chart1');
+
+var chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
+chart2.render(chart2, 'chart2');
+
 var chart3 = new ApexCharts(document.querySelector("#chart3"), options3);
-chart3.render();
+chart3.render(chart3, 'chart3');
+
+var chart4 = new ApexCharts(document.querySelector("#chart4"), options);
+chart4.render(chart4, 'chart4');
+
+var chart5 = new ApexCharts(document.querySelector("#chart5"), options2);
+chart5.render(chart5, 'chart5');
+
+var chart6 = new ApexCharts(document.querySelector("#chart6"), options);
+chart6.render(chart6, 'chart6');
+
+
+updateChartDimensions(1);
